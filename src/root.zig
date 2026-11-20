@@ -12,19 +12,21 @@ pub const Tree = std.AutoHashMap(usize, std.ArrayList(usize));
 
 pub fn generateCollatzBranches(allocator: std.mem.Allocator, tree: *Tree, N: usize) !void {
     // 1 to N-1
+    std.debug.print("1 - N but odd:", .{});
     for (1..(N + 1) / 2) |x_count| {
         const x = 2 * x_count + 1;
+        std.debug.print(" {}", .{x});
         try tree.put(x, .empty);
-        for (0..std.math.log2_int(usize, N / x)) |m| {
+        // depth m to double odd root by
+        for (0..std.math.log2_int(usize, N / x) + 1) |m| {
             try tree.getEntry(x).?.value_ptr.append(allocator, x * std.math.pow(usize, 2, m));
-        }
-        if (tree.get(x).?.items.len == 0) {
-            try tree.getEntry(x).?.value_ptr.append(allocator, x);
         }
     }
     // all odd numbers from 3 to N
+    std.debug.print("\n3 to N odd:", .{});
     for (0..(N - 1) / 2) |x_count| {
         var x = 2 * x_count + 3;
+        std.debug.print(" {}", .{x});
         while (x != 1) {
             // std.debug.print("x:{}", .{x});
             const b = 3 * x + 1;
